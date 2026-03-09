@@ -253,10 +253,8 @@ df["steer_multiplier"] = 1.0
 if area_col in df.columns:
     if pos_areas:
         df.loc[df[area_col].astype(str).isin(pos_areas), "steer_multiplier"] *= pos_boost
-
     if neg_areas:
         if exclude_negative:
-            # Mark for exclusion later
             df["exclude_flag"] = False
             df.loc[df[area_col].astype(str).isin(neg_areas), "exclude_flag"] = True
         else:
@@ -273,6 +271,11 @@ df_display = df.copy()
 if exclude_negative and "exclude_flag" in df_display.columns:
     df_display = df_display[~df_display["exclude_flag"]]
 
+if show_only_focus and area_col in df_display.columns and pos_areas:
+    df_display = df_display[
+        df_display[area_col].fillna("").astype(str).isin(pos_areas)
+    ]
+    
 df_sorted = df_display.sort_values("suitability_focus", ascending=False)
 
 # MAP
